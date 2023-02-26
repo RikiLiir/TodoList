@@ -2,8 +2,10 @@ const express = require('express')
 const app = express()
 const port = 3000
 const fs = require('fs')
-app.use (express.json())
 
+var cors = require('cors')
+app.use(cors())
+app.use (express.json())
 
 app.post('/todos', (req, res) => {
     fs.readFile('users.json', 'utf8', (err, data) => {
@@ -14,7 +16,7 @@ app.post('/todos', (req, res) => {
             let users = JSON.parse(data)
             let user = users.find(user => user.username === req.body.username)
             if (user) {
-                users[users.indexOf(user)].todos=(req.body.todos)
+                users[users.indexOf(user)].todos = req.body.todos
                 fs.writeFile('users.json', JSON.stringify(users), (err) => {
                     if (err) {
                         console.log(err)
@@ -29,11 +31,9 @@ app.post('/todos', (req, res) => {
     })
 })
 
-    app.listen(port, () => {
+  app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
-
-
 
 app.post('/login', (req, res) => {
     fs.readFile('users.json', 'utf8', (err, data) => {

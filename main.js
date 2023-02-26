@@ -3,12 +3,23 @@ window.addEventListener('load', () => {
 	const nameInput = document.querySelector('#name');
 	const newTodoForm = document.querySelector('#new-todo-form');
 
-	const username = localStorage.getItem('username') || '';
+	if(!localStorage.getItem('username')) {
+		window.location.href = 'login.html';
+	}
+	
+	const username = localStorage.getItem('username');
 
 	nameInput.value = username;
 
 	nameInput.addEventListener('change', (e) => {
 		localStorage.setItem('username', e.target.value);
+	})
+
+	const logOutButton = document.querySelector('#logout');
+	logOutButton.addEventListener('click', () => {
+		localStorage.removeItem('username');
+		localStorage.removeItem('todos');
+		window.location.href = 'login.html';
 	})
 
 	newTodoForm.addEventListener('submit', e => {
@@ -24,6 +35,20 @@ window.addEventListener('load', () => {
 		todos.push(todo);
 
 		localStorage.setItem('todos', JSON.stringify(todos));
+		fetch('http://localhost:3000/todos', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				username: nameInput.value,
+				todos: todos
+			})
+		}).then(res => res.json())
+		.then(data => {
+			console.log(data)
+		})
+
 
 		// Reset the form
 		e.target.reset();
@@ -84,6 +109,20 @@ function DisplayTodos () {
 		input.addEventListener('change', (e) => {
 			todo.done = e.target.checked;
 			localStorage.setItem('todos', JSON.stringify(todos));
+			fetch('http://localhost:3000/todos', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({
+					username: document.querySelector('#name').value,
+					todos: todos
+				})
+				}).then(res => res.json())
+				.then(data => {
+					console.log(data)
+				})
+
 
 			if (todo.done) {
 				todoItem.classList.add('done');
@@ -103,6 +142,19 @@ function DisplayTodos () {
 				input.setAttribute('readonly', true);
 				todo.content = e.target.value;
 				localStorage.setItem('todos', JSON.stringify(todos));
+				fetch('http://localhost:3000/todos', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				username: document.querySelector('#name').value,
+				todos: todos
+			})
+		}).then(res => res.json())
+		.then(data => {
+			console.log(data)
+		})
 				DisplayTodos()
 
 			})
@@ -111,6 +163,19 @@ function DisplayTodos () {
 		deleteButton.addEventListener('click', (e) => {
 			todos = todos.filter(t => t != todo);
 			localStorage.setItem('todos', JSON.stringify(todos));
+			fetch('http://localhost:3000/todos', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({
+				username: document.querySelector('#name').value,
+				todos: todos
+			})
+		}).then(res => res.json())
+		.then(data => {
+			console.log(data)
+		})
 			DisplayTodos()
 		})
 
